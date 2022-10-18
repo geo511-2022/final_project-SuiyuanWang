@@ -1,0 +1,27 @@
+Package: GEO511_Project_Template
+Type: Website
+Title: Project Template for GEO511
+Version: 0.1.0
+Author: Adam M. Wilson <adamw@buffalo.edu>
+Maintainer: Adam M. Wilson <adamw@buffalo.edu>
+Description: Template used to create student projects. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    rmarkdown,
+    tidyverse,
+    viridis,
+    colourvalues,
+    sf,
+    raster,
+    sp,
+    plotly,
+    testthat,
+    kableExtra,
+    knitr,
+    leaflet
+Suggests: 
+RoxygenNote: 7.1.1
+URL: https://github.com/AdamWilsonLabEDU/geo511_project_template
+BugReports: https://github.com/AdamWilsonLabEDU/geo511_project_template/issues
