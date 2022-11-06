@@ -1,9 +1,9 @@
-# Project template for GEO511
+# Suiyuan Wang's final project for GEO511:Spatial Data Science Fall, 2022
 
-[![main](https://github.com/AdamWilsonLabEDU/geo511_project_template/workflows/main/badge.svg)](https://github.com/AdamWilsonLabEDU/geo511_project_template/actions)
+![main](https://github.com/AdamWilsonLabEDU/geo511_project_template/actions)
 
 ## Background
-This repository serves as a template for the final project in _Spatial Data Science_, (GEO511) a course held at the University at Buffalo.  
+GEO511 is a course held at the University at Buffalo. 
 
 
 ### TODOs:
