@@ -2,9 +2,6 @@
 title: "Mapping 100m population grid using dasymetric method"
 author: Suiyuan Wang
 subtitle: A case study in Buffalo city
-output:
-  github_document
-knit: {rmarkdown::render("case_study_09.Rmd",output_format = "all")}
 ---
 
 # Introduction
