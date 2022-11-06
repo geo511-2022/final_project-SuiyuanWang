@@ -1,14 +1,20 @@
 ---
-title: "My Final Project Template"
-author: Your name here
-subtitle: Subtitle here if desired
+title: "Mapping 100m population grid using dasymetric method"
+author: Suiyuan Wang
+subtitle: A case study in Buffalo city
+output:
+  github_document
+knit: {rmarkdown::render("case_study_09.Rmd",output_format = "all")}
 ---
 
 # Introduction
 
 [~ 200 words]
 
-Clearly stated background and questions / hypotheses / problems being addressed. Sets up the analysis in an interesting and compelling way.
+Background and questions: Fine scale population can provide fundmental information for 
+hypotheses
+problems being addressed 
+Sets up the analysis in an interesting and compelling way.
 
 # Materials and methods
 
