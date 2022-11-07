@@ -17,6 +17,35 @@ Code: The code associated with the project is well organized and easy to follow.
 Data: The underlying data are publicly accessible via the web and downloaded/accessed within the Rmd script. If you want to use your own data, you must make it available on a website (e.g. Figshare) so that others are able to re-run your code.
 
 1. using `tidycensus` get `census block group` data for buffalo city.
+
+Load any required packages in a code chunk (you may need to install some packages):
+
+```{r, message=F, warning=F}
+library(tidyverse)
+library(tidycensus)
+library(tigris)
+options(tigris_use_cache = TRUE)
+library(leaflet)
+library(kableExtra)
+knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
+```
+
+```{r}
+census_api_key("83e6682de7bfa24b9c6133fc65a0aea557d1f7b4")
+racevars <- c(White = "P005003", 
+              Black = "P005004", 
+              Asian = "P005006", 
+              Hispanic = "P004003")
+erie <- get_decennial(geography = "block", 
+                      variables = racevars, 
+                      state = "NY", 
+                      county = "Erie County", 
+                      geometry = TRUE,
+                      summary_var = "P001001",
+                      cache_table=T)
+
+```
+
 2. using `buffalo boundary` generate 100m grids for buffalo area. (download from my sharing drive/notion)
 3. input `microsoft building footprint` for buffalo area. (download from my sharing drive/notion)
 4. count the number of buildings, and sum the area of buildings in the 100m grid
@@ -29,14 +58,7 @@ Here's my first code chunk.
 1+2
 ```
 
-Load any required packages in a code chunk (you may need to install some packages):
 
-```{r, message=F, warning=F}
-library(tidyverse)
-library(leaflet)
-library(kableExtra)
-knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
-```
 
 ## Download and clean all required data
 ```{r}
