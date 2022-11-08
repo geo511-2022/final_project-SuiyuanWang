@@ -29,6 +29,18 @@ knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 
 1. Get 2020`census block group` shapefile for buffalo city.
 
+Two key packages: `sf` for vectors and `raster` for grid.
+Additional packaegs discussed: `ggplot2`, `tmap`, `dplyr`
+
+read in vector data with the `sf` package and st_read().
+read in raster data using the raster package and either the raster()or brick() functions.
+raster(): single band raster
+brick(): multi-band raster.
+write your data:
+vector
+st_write(my_poly, "data/my_poly.shp")
+raster
+writeRaster(my_raster, "data/my_raster.tif")
 ```{r}
 # TODOs: upload census boundary, census block group shapefile, and census block shapefile, microsoft buffalo building footprint.
 
