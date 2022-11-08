@@ -19,6 +19,7 @@ library(tigris)
 options(tigris_use_cache = TRUE)
 library(leaflet)
 library(kableExtra)
+library(piggyback)
 knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 ```
 
@@ -29,37 +30,73 @@ knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 * Microsoft building footprint (2018).
 * Buffalo zoning data
 ```{r}
+dataurl = "https://github.com/geo511-2022/final_project-SuiyuanWang/releases/download/v1.0.0/Data_GEO511_project.zip"
+tdir=tempdir()
+download.file(dataurl,"temp.zip")
+unzip("temp.zip") #unzip the compressed folder
+```
+
+```{r}
 # Buffalo city zoning data Landuse.
-landuse <- read_sf("data/zoning.shp") 
+landuse <- st_read("Data_GEO511_project/zoning.shp") 
 
 ## definition
-source_geom <- read_sf("data/census_bg.shp")
-target_geom <- read_sf("data/census_block.shp")
+source_geom <- st_read("Data_GEO511_project/census_bg.shp")
+target_geom <- st_read("Data_GEO511_project/census_block.shp")
 
 # ancillary data
-bf <- read_sf("data/building.shp")
+bf <- st_read("Data_GEO511_project/building.shp")
 
-plot(source_geom["population_bg"],breaks = c(0,5000,10000,15000,20000,25000,30000,35000,40000,45000), main="Buffalo city Population at Census Block Group (2020)")
+plot(source_geom["population"],breaks = c(0,200,400,600,800,1000,1200, 1400,1600), main="Buffalo city Population at Census Block Group (2020)")
+
+#st_crs(bf)
+#st_crs(target_geom)
+#st_crs(source_geom)
+#st_crs(landuse)
 ```
 
 2. Clean required data
 ```{r dasymetric, warning=FALSE, message=FALSE}
 ###filter landuse as residential, using residential landuse to filter building footprint
-residential = prep_landuse(landuse)
-residential_bf = filter(bf, residential)
+### find [zoning codes](https://data.buffalony.gov/Economic-Neighborhood-Development/Zoning/5843-jknb) related to residential: 
+residential_code = c('N-2R', 'N-3R', 'N-4-30', 'N-4-50', 'D-R')
+residential <- landuse %>% filter(gcode == residential_code) 
+
+residential_wgs84  <- residential %>%  st_transform(4326) 
+
+library(sf)
+library(spdep)
+library(sp)
+library(spData)
+
+library(sfnetworks)
+library(sf)
+library(tidygraph)
+library(tidyverse)
+library(igraph)
+#bf_wgs84 <- poly2nb(st_make_valid(bf))
+#residential_wgs84 <- poly2nb(st_make_valid(residential_wgs84))
+sf_use_s2(FALSE)
+residential_bf <- st_intersects(bf, residential_wgs84)
+
+residential_bf
 ```
 
 ```{r dasymetric, warning=FALSE, message=FALSE}
+target_geom_wgs84  <- target_geom %>%  st_transform(4326) 
+source_geom_wgs84  <- source_geom %>%  st_transform(4326) 
 # dasymetric map with landuse information as ancillary data
-dm_pop = dasymetric_map(target_geom, source_geom, residential_bf, extensive = "population_b")
+sf_use_s2(FALSE)
+library(lwgeom)
+dm_pop = dasymetric_map(target_geom_wgs84, source_geom_wgs84, bf, extensive = "population")
 ```
 6. evaluating the result by integrating the grids data into census block level, and plot R2.
 [REFER TO] (https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
 ```{r}
-#calculate r2 in dm_pop, 'population_b' & 'population_bg'
-mod1 = lm(population_b~population_bg, data = dm_pop)
+#calculate r2 in dm_pop, 'population'(estimate) & 'Population'(ground truth)
+mod1 = lm(Population~population, data = dm_pop)
 modsum = summary(mod1)
-plot(dm_pop$population_b, dm_pop$population_bg, pch = 20, type = 'p', las = 1,
+plot(dm_pop$Population, dm_pop$population, pch = 20, type = 'p', las = 1,
 		xlab = expression(paste('Census block Population')),
 		ylab = 'Estimate population')
 
@@ -69,6 +106,7 @@ abline(mod1)
 
 ```{r}
 r2 = modsum$adj.r.squared
+r2
 ```
 
 ```{r}
@@ -78,7 +116,7 @@ modsum$coefficients
 ```{r}
 my.p = modsum$coefficients[2,4]
 mylabel = bquote(italic(R)^2 == .(format(r2, digits = 3)))
-text(x = 19, y = 2.5, labels = mylabel)
+plot.new(text(x = 19, y = 2.5, labels = mylabel))
 ```
 
 ```{r}
@@ -90,7 +128,7 @@ legend('topright', legend = rp, bty = 'n')
 
 7. mapping.
 ```{r}
-plot(dm_pop["pop_sum"],breaks = c(0,5000,10000,15000,20000,25000,30000,35000,40000,45000),main="Dasymetric Population Map based on landuse and building footprint(2020)")
+plot(dm_pop["population"],breaks = c(0,50,100,150,200,250,300,350,400,450),main="Dasymetric Population Map based on landuse and building footprint(2020)")
 ```
 
 ## Download and clean all required data
