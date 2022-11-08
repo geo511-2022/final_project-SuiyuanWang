@@ -27,10 +27,10 @@ knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
  * Census block population_block
  * Census block group population_bg
 * Microsoft building footprint (2018).
-* OSM land use
+* Buffalo zoning data
 ```{r}
-# raster of Buffalo city Landuse.100m.
-landuse <- raster("data/Buffalo_landuse.tif") 
+# Buffalo city zoning data Landuse.
+landuse <- read_sf("data/zoning.shp") 
 
 ## definition
 source_geom <- read_sf("data/census_bg.shp")
