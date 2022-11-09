@@ -20,6 +20,8 @@ options(tigris_use_cache = TRUE)
 library(leaflet)
 library(kableExtra)
 library(piggyback)
+library(tmap) 
+library(lwgeom)
 knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 ```
 
@@ -30,28 +32,45 @@ knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 * Microsoft building footprint (2018).
 * Buffalo zoning data
 ```{r}
-dataurl = "https://github.com/geo511-2022/final_project-SuiyuanWang/releases/download/v1.0.0/Data_GEO511_project.zip"
-tdir=tempdir()
+dataurl = "https://github.com/geo511-2022/final_project-SuiyuanWang/releases/download/v1.0.2/Data_GEO511_project.zip"
+
+#tdir=tempdir()
+#download.file(dataurl,destfile=file.path(tdir,"temp.zip"))
+#unzip(file.path(tdir,"temp.zip"),exdir = tdir) #unzip the compressed folder
+
 download.file(dataurl,"temp.zip")
 unzip("temp.zip") #unzip the compressed folder
 ```
 
 ```{r}
-# Buffalo city zoning data Landuse.
 landuse <- st_read("Data_GEO511_project/zoning.shp") 
-
-## definition
 source_geom <- st_read("Data_GEO511_project/census_bg.shp")
 target_geom <- st_read("Data_GEO511_project/census_block.shp")
+residential_bf <- st_read("Data_GEO511_project/residential_bf.shp")
+# Create directory path
+#dsn_zoning <- file.path(tdir, "Data_GEO511_project", "zoning.shp")
+#dsn_census_bg <- file.path(tdir, "Data_GEO511_project", "census_bg.shp") 
+#dsn_census_block <- file.path(tdir, "Data_GEO511_project","census_block.shp") 
+#dsn_residential_bf <- file.path(tdir, "Data_GEO511_project","residential_bf.shp") 
 
-# ancillary data
-bf <- st_read("Data_GEO511_project/building.shp")
+# Buffalo city zoning data (Landuse), source (block group), target (block)
+#landuse <- st_read(dsn_zoning) 
+#source_geom <- st_read(dsn_census_bg)
+#target_geom <- st_read(dsn_census_block)
+#residential_bf <- st_read(dsn_residential_bf)
+# ancillary data (building footprint)
+#bf <- st_read("Data_GEO511_project/building.shp")
+```
+```{r}
+#library(RColorBrewer)
+#cols <- brewer.pal(7, "YlOrRd")
 
+# plot(dm_pop["Population"],col = alpha(cols, 0.9), main="Buffalo city Population at Census Block Group (2020)")
 
-library(RColorBrewer)
-cols <- brewer.pal(7, "YlOrRd")
-
-plot(dm_pop["population"],col = alpha(cols, 0.9), main="Buffalo city Population at Census Block Group (2020)")
+tm_shape(source_geom) +
+  tm_fill(col = "population", style = "jenks", size = 0.5, title = "Population") +
+  tm_layout(title = "Buffalo city Population at Census Block Group (2020)") +
+  tmap_mode("view")
 
 #st_crs(bf)
 #st_crs(target_geom)
@@ -59,8 +78,9 @@ plot(dm_pop["population"],col = alpha(cols, 0.9), main="Buffalo city Population 
 #st_crs(landuse)
 ```
 
+
 2. Clean required data
-```{r dasymetric, warning=FALSE, message=FALSE}
+
 ###filter landuse as residential, using residential landuse to filter building footprint
 ### find [zoning codes](https://data.buffalony.gov/Economic-Neighborhood-Development/Zoning/5843-jknb) related to residential: 
 residential_code = c('N-2R', 'N-3R', 'N-4-30', 'N-4-50', 'D-R')
@@ -68,33 +88,28 @@ residential <- landuse %>% filter(gcode == residential_code)
 
 residential_wgs84  <- residential %>%  st_transform(4326) 
 
-library(sf)
-library(spdep)
-library(sp)
-library(spData)
-
-library(sfnetworks)
-library(sf)
-library(tidygraph)
-library(tidyverse)
-library(igraph)
+#library(sf)
 #bf_wgs84 <- poly2nb(st_make_valid(bf))
 #residential_wgs84 <- poly2nb(st_make_valid(residential_wgs84))
 sf_use_s2(FALSE)
 
-residential_bf <- st_intersects(bf, residential_wgs84)
+#residential_bf <- st_intersects(bf, residential_wgs84)
 
-residential_bf
-```
+#residential_bf
 
+set same projection for geometries. 
 ```{r dasymetric, warning=FALSE, message=FALSE}
 target_geom_wgs84  <- target_geom %>%  st_transform(4326) 
 source_geom_wgs84  <- source_geom %>%  st_transform(4326) 
-residential_bf <- st_read("Data_GEO511_project/residential_bf.shp")
+
 # dasymetric map with landuse information as ancillary data
 sf_use_s2(FALSE)
-library(lwgeom)
+
 dm_pop = dasymetric_map(target_geom_wgs84, source_geom_wgs84, residential_bf, extensive = "population")
+
+
+dm_pop[is.na(dm_pop)] <- 0 
+dm_pop$population = as.integer(dm_pop$population)
 ```
 6. evaluating the result by integrating the grids data into census block level, and plot R2.
 [REFER TO] (https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
@@ -112,57 +127,34 @@ abline(mod1)
 
 ```{r}
 r2 = modsum$adj.r.squared
-r2
+print(paste("R2 = ", r2))
 ```
 
 ```{r}
 modsum$coefficients
 ```
 
-```{r}
-my.p = modsum$coefficients[2,4]
-mylabel = bquote(italic(R)^2 == .(format(r2, digits = 3)))
-text(x = 19, y = 2.5, labels = mylabel)
-```
-
-```{r}
-mylabel = bquote(italic(R)^2 == .(format(r2, digits = 3)))
-text(x = 19, y = 2.5, labels = mylabel)
-legend('topright', legend = rp, bty = 'n')
-```
-
 
 7. mapping.
 ```{r}
-library(RColorBrewer)
-cols <- brewer.pal(5, "YlOrRd")
-# https://geocompr.robinlovelace.net/adv-map.html
-dm_pop[is.na(dm_pop)] <- 0 
-library(tmap) 
 tm_shape(dm_pop) +
-  tm_fill(col = "population", style = "jenks") +
-  tm_layout(title = "Population distribution in Buffalo, NY") +
-  tmap_mode("view")
+  tm_fill(col = c("population", "Population"), 
+          style = "jenks", 
+          title = c("Estimate_Population", "True_Population")) +
+  tm_layout(main.title = "Population distribution in Buffalo, NY (2020)", 
+            legend.position = c("left","bottom"))  + 
+  tm_facets(ncol = 2, sync = TRUE)
+  
+  
+  
+  #tmap_mode("view")
+
+#true <- tm_shape(target_geom_wgs84) +tm_fill(col = "Population", style = "jenks", title = "True_Population", popup.vars = "Population") +tm_layout(title = "Population distribution at fine scale in Buffalo, NY (2020)") +tmap_mode("view")
 
 
 #plot(dm_pop["population"],col = alpha(cols, 0.9), main="Dasymetric Population Map based on landuse and building footprint(2020)", legend("topleft"))
 #breaks = c(0,50,100,150,200,250,300,350,400,450)
 ```
-
-## leaflet pop shapefile, show population.
-```{r}
-
-```
-
-```{r, results='asis'}
-data %>% 
-  slice(1:10) %>% #show only 1:n rows
-  kable(digits=2,align="c")%>% #make table and round to two digits
-  kable_styling(bootstrap_options = 
-                  c("striped", "hover", "condensed", "responsive")) #apply other formatting
-```
-
-Add any additional processing steps here.
 
 # Results
 
@@ -171,16 +163,6 @@ Add any additional processing steps here.
 Tables and figures (maps and other graphics) are carefully planned to convey the results of your analysis. Intense exploration and evidence of many trials and failures. The author looked at the data in many different ways before coming to the final presentation of the data.
 
 Show tables, plots, etc. and describe them.
-
-```{r, fig.width=6, fig.height=3, fig.cap="Map of completely random data"}
-m <- leaflet(data) %>% 
-  addTiles() %>% 
-  addCircleMarkers(~x, ~y, radius = ~size,color = ~as.factor(category)) %>% 
-  addPopups(~x[2], ~y[2], "Random popup")
-m  # a map with the default OSM tile layer
-```
-
-
 
 
 # Conclusions
