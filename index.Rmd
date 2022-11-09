@@ -47,7 +47,11 @@ target_geom <- st_read("Data_GEO511_project/census_block.shp")
 # ancillary data
 bf <- st_read("Data_GEO511_project/building.shp")
 
-plot(source_geom["population"],breaks = c(0,200,400,600,800,1000,1200, 1400,1600), main="Buffalo city Population at Census Block Group (2020)")
+
+library(RColorBrewer)
+cols <- brewer.pal(7, "YlOrRd")
+
+plot(dm_pop["population"],col = alpha(cols, 0.9), main="Buffalo city Population at Census Block Group (2020)")
 
 #st_crs(bf)
 #st_crs(target_geom)
@@ -77,6 +81,7 @@ library(igraph)
 #bf_wgs84 <- poly2nb(st_make_valid(bf))
 #residential_wgs84 <- poly2nb(st_make_valid(residential_wgs84))
 sf_use_s2(FALSE)
+
 residential_bf <- st_intersects(bf, residential_wgs84)
 
 residential_bf
@@ -85,10 +90,11 @@ residential_bf
 ```{r dasymetric, warning=FALSE, message=FALSE}
 target_geom_wgs84  <- target_geom %>%  st_transform(4326) 
 source_geom_wgs84  <- source_geom %>%  st_transform(4326) 
+residential_bf <- st_read("Data_GEO511_project/residential_bf.shp")
 # dasymetric map with landuse information as ancillary data
 sf_use_s2(FALSE)
 library(lwgeom)
-dm_pop = dasymetric_map(target_geom_wgs84, source_geom_wgs84, bf, extensive = "population")
+dm_pop = dasymetric_map(target_geom_wgs84, source_geom_wgs84, residential_bf, extensive = "population")
 ```
 6. evaluating the result by integrating the grids data into census block level, and plot R2.
 [REFER TO] (https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
@@ -116,7 +122,7 @@ modsum$coefficients
 ```{r}
 my.p = modsum$coefficients[2,4]
 mylabel = bquote(italic(R)^2 == .(format(r2, digits = 3)))
-plot.new(text(x = 19, y = 2.5, labels = mylabel))
+text(x = 19, y = 2.5, labels = mylabel)
 ```
 
 ```{r}
@@ -128,19 +134,24 @@ legend('topright', legend = rp, bty = 'n')
 
 7. mapping.
 ```{r}
-plot(dm_pop["population"],breaks = c(0,50,100,150,200,250,300,350,400,450),main="Dasymetric Population Map based on landuse and building footprint(2020)")
+library(RColorBrewer)
+cols <- brewer.pal(5, "YlOrRd")
+# https://geocompr.robinlovelace.net/adv-map.html
+dm_pop[is.na(dm_pop)] <- 0 
+library(tmap) 
+tm_shape(dm_pop) +
+  tm_fill(col = "population", style = "jenks") +
+  tm_layout(title = "Population distribution in Buffalo, NY") +
+  tmap_mode("view")
+
+
+#plot(dm_pop["population"],col = alpha(cols, 0.9), main="Dasymetric Population Map based on landuse and building footprint(2020)", legend("topleft"))
+#breaks = c(0,50,100,150,200,250,300,350,400,450)
 ```
 
-## Download and clean all required data
+## leaflet pop shapefile, show population.
 ```{r}
-n=20
-data=data.frame(x=runif(n,-180,180),
-                y=runif(n,-60,60),
-                size = runif(n, 5, 20),
-                category = factor(
-                  sample(letters[1:5], n, replace = TRUE)
-                  ),
-                value = rnorm(n))
+
 ```
 
 ```{r, results='asis'}
