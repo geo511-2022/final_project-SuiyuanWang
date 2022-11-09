@@ -67,10 +67,10 @@ residential_bf <- st_read("Data_GEO511_project/residential_bf.shp")
 
 # plot(dm_pop["Population"],col = alpha(cols, 0.9), main="Buffalo city Population at Census Block Group (2020)")
 
-tm_shape(source_geom) +
-  tm_fill(col = "population", style = "jenks", size = 0.5, title = "Population") +
-  tm_layout(title = "Buffalo city Population at Census Block Group (2020)") +
-  tmap_mode("view")
+#tm_shape(source_geom) +
+# tm_fill(col = "population", style = "jenks", size = 0.5, title = "Population") +
+# tm_layout(title = "Buffalo city Population at Census Block Group (2020)") +
+# tmap_mode("view")
 
 #st_crs(bf)
 #st_crs(target_geom)
@@ -107,17 +107,17 @@ sf_use_s2(FALSE)
 
 dm_pop = dasymetric_map(target_geom_wgs84, source_geom_wgs84, residential_bf, extensive = "population")
 
-
+# convert estimation result to integer, and replace NA as 0.
 dm_pop[is.na(dm_pop)] <- 0 
 dm_pop$population = as.integer(dm_pop$population)
 ```
-6. evaluating the result by integrating the grids data into census block level, and plot R2.
+6. Evaluating the result by plotting ground truth data and estimation result. Then, calculate R2 and coefficients.
 [REFER TO] (https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
 ```{r}
 #calculate r2 in dm_pop, 'population'(estimate) & 'Population'(ground truth)
 mod1 = lm(Population~population, data = dm_pop)
 modsum = summary(mod1)
-plot(dm_pop$Population, dm_pop$population, pch = 20, type = 'p', las = 1,
+plot(dm_pop$Population, dm_pop$population, type = 'p', las = 1,
 		xlab = expression(paste('Census block Population')),
 		ylab = 'Estimate population')
 
@@ -135,25 +135,14 @@ modsum$coefficients
 ```
 
 
-7. mapping.
+7. Mapping. We are using `tmap` to show the ground truth and estimation result in a interactive map. By exploring the map, we can easily find the outliner location and discuss the reason.
 ```{r}
 tm_shape(dm_pop) +
   tm_fill(col = c("population", "Population"), 
           style = "jenks", 
-          title = c("Estimate_Population", "True_Population")) +
-  tm_layout(main.title = "Population distribution in Buffalo, NY (2020)", 
-            legend.position = c("left","bottom"))  + 
-  tm_facets(ncol = 2, sync = TRUE)
-  
-  
-  
-  #tmap_mode("view")
-
-#true <- tm_shape(target_geom_wgs84) +tm_fill(col = "Population", style = "jenks", title = "True_Population", popup.vars = "Population") +tm_layout(title = "Population distribution at fine scale in Buffalo, NY (2020)") +tmap_mode("view")
-
-
-#plot(dm_pop["population"],col = alpha(cols, 0.9), main="Dasymetric Population Map based on landuse and building footprint(2020)", legend("topleft"))
-#breaks = c(0,50,100,150,200,250,300,350,400,450)
+          title = c("Estimate_Population", "True_Population")) + 
+  tm_facets(ncol = 2, sync = TRUE) +
+  tmap_mode("view")
 ```
 
 # Results
@@ -175,19 +164,3 @@ Clear summary adequately describing the results and putting them in context. Dis
 
 All sources are cited in a consistent manner
 
-
-
-
-
-Two key packages: `sf` for vectors and `raster` for grid.
-Additional packaegs discussed: `ggplot2`, `tmap`, `dplyr`
-
-read in vector data with the `sf` package and st_read().
-read in raster data using the raster package and either the raster()or brick() functions.
-raster(): single band raster
-brick(): multi-band raster.
-write your data:
-vector
-st_write(my_poly, "data/my_poly.shp")
-raster
-writeRaster(my_raster, "data/my_raster.tif")
