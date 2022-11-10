@@ -13,10 +13,6 @@ Knowledge of the fine-level population distribution is vital for measuring the i
 ```{r, message=F, warning=F}
 require(sf)
 require(dasymetric)
-library(tidyverse)
-library(tidycensus)
-library(tigris)
-options(tigris_use_cache = TRUE)
 library(leaflet)
 library(kableExtra)
 library(piggyback)
