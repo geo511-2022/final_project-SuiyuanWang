@@ -13,18 +13,10 @@ Knowledge of the fine-level population distribution is vital for measuring the i
 ## Load request packages for this project.
 ```{r, message=F, warning=F}
 library(sf)
-# install.packages("devtools")
-# devtools::install_github("JaFro96/dasymetric")
-#library(dasymetric)
 library(leaflet)
 library(piggyback)
 library(tmap) 
 library(lwgeom)
-#install.packages("remotes")
-#remotes::install_github("JaFro96/dasymetric")
-#library(remotes)
-#install_github("JaFro96/dasymetric")
-# auth_token = Sys.getenv('GH_PAT')
 knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 ```
 
@@ -42,7 +34,6 @@ download.file(dataurl,"temp.zip")
 unzip("temp.zip") #unzip the compressed folder
 ```
 ```{r, echo=FALSE}
-
 dasymetric_map <- function(target, source, ancillary_data, tid = NULL, extensive = NULL) {
 
   # Add IDs
