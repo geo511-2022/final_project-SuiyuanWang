@@ -11,8 +11,7 @@ jobs:
         run: |-
           Rscript -e "install.packages('remotes', repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
           Rscript -e "remotes::install_deps(dependencies = TRUE, repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
-          Rscript -e "install.packages(c('testthat','RCurl','questionr', 'devtools'))"
-          Rscript -e "devtools::install_github('JaFro96/dasymetric', Sys.setenv(GITHUB_PAT = 'GH_PAT'))"
+          Rscript -e "install.packages(c('testthat','RCurl','questionr'))"
           Rscript -e "questionr::qscan(list.files(pattern='*.R',recursive=T), load = TRUE, detail = FALSE)"
       - name: Render Site
         env:

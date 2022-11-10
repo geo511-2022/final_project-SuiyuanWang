@@ -15,7 +15,7 @@ Knowledge of the fine-level population distribution is vital for measuring the i
 library(sf)
 # install.packages("devtools")
 # devtools::install_github("JaFro96/dasymetric")
-library(dasymetric)
+#library(dasymetric)
 library(leaflet)
 library(piggyback)
 library(tmap) 
@@ -40,6 +40,64 @@ dataurl = "https://github.com/geo511-2022/final_project-SuiyuanWang/releases/dow
 
 download.file(dataurl,"temp.zip")
 unzip("temp.zip") #unzip the compressed folder
+```
+```{r, echo=FALSE}
+
+dasymetric_map <- function(target, source, ancillary_data, tid = NULL, extensive = NULL) {
+
+  # Add IDs
+  if(missing(tid)){
+    target[['AW_tid']] <- 1:nrow(target)
+    tid <- 'AW_tid'
+  }
+  source[['AW_sid']] <- 1:nrow(source)
+
+  # Intersect Source to Intermediate
+  first_int <- sf::st_intersection(source, ancillary_data)
+
+  # Generate ID for Intersection
+  first_int['AW_fid'] <- 1:nrow(first_int)
+
+  # Compute Area for First Interpolation
+  first_int['AW_area'] <- sf::st_area(first_int)
+
+  # Calculate Area as a Proportion of Source Area
+  cov_area <- first_int |>
+    sf::st_drop_geometry() |>
+    dplyr::group_by(.data$AW_sid) |>
+    dplyr::summarise(AW_cov_area = sum(.data$AW_area))
+
+  first_int <- dplyr::left_join(first_int, cov_area, by = 'AW_sid')
+  first_int['AW_area_prp'] <- as.numeric(first_int$AW_area / first_int$AW_cov_area)
+
+  # Multiply Extensive Variables by this Proportion
+  for(i in extensive){
+    first_int[[i]] <- first_int[[i]] * first_int[['AW_area_prp']]
+  }
+
+  # Intersect Again, Intermediate to Target
+  target_int <- sf::st_intersection(first_int, target)
+
+  # Calculate New Area (And Ratio)
+  target_int['AW_t_area'] <- sf::st_area(target_int)
+  target_int['AW_t_prp'] <- as.numeric(target_int[['AW_t_area']] / target_int[['AW_area']])
+
+  # Multiply Extensive Again
+  for(i in extensive){
+    target_int[[i]] <- target_int[[i]] * target_int[['AW_t_prp']]
+  }
+
+  # Group And Summarise Extensive
+  summary <- target_int |>
+    sf::st_drop_geometry() |>
+    dplyr::group_by(!!dplyr::sym(tid)) |>
+    dplyr::summarise_at(extensive, sum)
+
+  # Join To Target
+  target <- dplyr::left_join(target, summary, by = tid)
+
+  return(target)
+}
 ```
 
 ### Load data.
@@ -91,6 +149,8 @@ dm_pop$population = as.integer(dm_pop$population)
 
 Evaluating the result by plotting ground truth data and estimation result. Then, calculate R2 and coefficients.
 [REFER TO](https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
+The results shows R2 for this research is 0.62. We can see the potential by only use building footprint as ancillary data to downscaling population. It shows population distribution has high correlation with residential building distribution.
+The plot shows the most block's population are less than 500. 
 ```{r}
 #calculate r2 in dm_pop, 'population'(estimate) & 'Population'(ground truth)
 mod1 = lm(Population~population, data = dm_pop)
