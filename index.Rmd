@@ -21,7 +21,7 @@ library(piggyback)
 library(tmap) 
 library(lwgeom)
 #install.packages("remotes")
-#remotes::install_github("JaFro96/dasymetricap")
+#remotes::install_github("JaFro96/dasymetric")
 #library(remotes)
 #install_github("JaFro96/dasymetric")
 knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
