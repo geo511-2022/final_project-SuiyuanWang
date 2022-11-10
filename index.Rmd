@@ -147,11 +147,38 @@ tm_shape(dm_pop) +
 
 # Results
 
-[~200 words]
+Evaluating the result by plotting ground truth data and estimation result. Then, calculate R2 and coefficients.
+[REFER TO] (https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
+```{r}
+#calculate r2 in dm_pop, 'population'(estimate) & 'Population'(ground truth)
+mod1 = lm(Population~population, data = dm_pop)
+modsum = summary(mod1)
+plot(dm_pop$Population, dm_pop$population, type = 'p', las = 1,
+		xlab = expression(paste('Census block Population')),
+		ylab = 'Estimate population')
 
-Tables and figures (maps and other graphics) are carefully planned to convey the results of your analysis. Intense exploration and evidence of many trials and failures. The author looked at the data in many different ways before coming to the final presentation of the data.
+#adding the regression line from the linear model
+abline(mod1)
+```
 
-Show tables, plots, etc. and describe them.
+```{r}
+r2 = modsum$adj.r.squared
+print(paste("R2 = ", r2))
+```
+
+```{r}
+modsum$coefficients
+```
+
+Mapping. We are using `tmap` to show the ground truth and estimation result in a interactive map. By exploring the map, we can easily find the outliner location and discuss the reason.
+```{r}
+tm_shape(dm_pop) +
+  tm_fill(col = c("population", "Population"), 
+          style = "jenks", 
+          title = c("Estimate_Population", "True_Population")) + 
+  tm_facets(ncol = 2, sync = TRUE) +
+  tmap_mode("view")
+```
 
 
 # Conclusions
