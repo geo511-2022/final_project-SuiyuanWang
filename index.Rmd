@@ -10,28 +10,26 @@ Knowledge of the fine-level population distribution is vital for measuring the i
 
 # Materials and methods
 
+## Load request packages for this project.
 ```{r, message=F, warning=F}
-require(sf)
-
-install.packages("remotes")
-remotes::install_github("JaFro96/dasymetricap")
-#library(remotes)
-#install_github("JaFro96/dasymetric")
-require(dasymetric)
+library(sf)
+# install.packages("devtools")
+# devtools::install_github("JaFro96/dasymetric")
+library(dasymetric)
 library(leaflet)
-library(kableExtra)
 library(piggyback)
 library(tmap) 
 library(lwgeom)
+#install.packages("remotes")
+#remotes::install_github("JaFro96/dasymetricap")
+#library(remotes)
+#install_github("JaFro96/dasymetric")
 knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 ```
 
-1. Download data 
-* Census boundaries (2020) with population. 
- * Census block population_block
- * Census block group population_bg
-* Microsoft building footprint (2018).
-* Buffalo zoning data
+## Data preprocessing
+### Download data 
+
 ```{r}
 dataurl = "https://github.com/geo511-2022/final_project-SuiyuanWang/releases/download/v1.0.2/Data_GEO511_project.zip"
 
@@ -43,68 +41,42 @@ download.file(dataurl,"temp.zip")
 unzip("temp.zip") #unzip the compressed folder
 ```
 
-
+### Load data.
+* Buffalo zoning data.
+* Census boundaries (2020) with population. 
+ * Census block population_block
+ * Census block group population_bg
+* Microsoft building footprint (2018).
 ```{r}
 landuse <- st_read("Data_GEO511_project/zoning.shp") 
 source_geom <- st_read("Data_GEO511_project/census_bg.shp")
 target_geom <- st_read("Data_GEO511_project/census_block.shp")
 residential_bf <- st_read("Data_GEO511_project/residential_bf.shp")
-# Create directory path
-#dsn_zoning <- file.path(tdir, "Data_GEO511_project", "zoning.shp")
-#dsn_census_bg <- file.path(tdir, "Data_GEO511_project", "census_bg.shp") 
-#dsn_census_block <- file.path(tdir, "Data_GEO511_project","census_block.shp") 
-#dsn_residential_bf <- file.path(tdir, "Data_GEO511_project","residential_bf.shp") 
-
-# Buffalo city zoning data (Landuse), source (block group), target (block)
-#landuse <- st_read(dsn_zoning) 
-#source_geom <- st_read(dsn_census_bg)
-#target_geom <- st_read(dsn_census_block)
-#residential_bf <- st_read(dsn_residential_bf)
-# ancillary data (building footprint)
-#bf <- st_read("Data_GEO511_project/building.shp")
-```
-```{r}
-#library(RColorBrewer)
-#cols <- brewer.pal(7, "YlOrRd")
-
-# plot(dm_pop["Population"],col = alpha(cols, 0.9), main="Buffalo city Population at Census Block Group (2020)")
-
-#tm_shape(source_geom) +
-# tm_fill(col = "population", style = "jenks", size = 0.5, title = "Population") +
-# tm_layout(title = "Buffalo city Population at Census Block Group (2020)") +
-# tmap_mode("view")
-
-#st_crs(bf)
+#st_crs(residential_bf)
 #st_crs(target_geom)
 #st_crs(source_geom)
 #st_crs(landuse)
 ```
 
+### Clean required data
 
-2. Clean required data
+For building footprint data, we first filter the data using zoning data that has residential property. Then, make the source data, target data and ancillary data have the consistent crs.
+Find [zoning codes](https://data.buffalony.gov/Economic-Neighborhood-Development/Zoning/5843-jknb) related to residential:
+```{r}
+### Residential zonings.The provided 'residential_bf.shp' already after filter using ArcGIS pro.
+#residential_code = c('N-2R', 'N-3R', 'N-4-30', 'N-4-50', 'D-R')
+#residential <- landuse %>% filter(gcode == residential_code) 
+#residential_wgs84  <- residential %>%  st_transform(4326) 
 
-###filter landuse as residential, using residential landuse to filter building footprint
-### find [zoning codes](https://data.buffalony.gov/Economic-Neighborhood-Development/Zoning/5843-jknb) related to residential: 
-residential_code = c('N-2R', 'N-3R', 'N-4-30', 'N-4-50', 'D-R')
-residential <- landuse %>% filter(gcode == residential_code) 
-
-residential_wgs84  <- residential %>%  st_transform(4326) 
-
-#library(sf)
-#bf_wgs84 <- poly2nb(st_make_valid(bf))
-#residential_wgs84 <- poly2nb(st_make_valid(residential_wgs84))
-sf_use_s2(FALSE)
-
-#residential_bf <- st_intersects(bf, residential_wgs84)
-
-#residential_bf
-
-set same projection for geometries. 
-```{r dasymetric, warning=FALSE, message=FALSE}
+# set projection for geometries.
 target_geom_wgs84  <- target_geom %>%  st_transform(4326) 
 source_geom_wgs84  <- source_geom %>%  st_transform(4326) 
+```
 
-# dasymetric map with landuse information as ancillary data
+### Disaggregate population 
+The data was downscaling from source zone (census block group) to target zone (census block) using building footprint areas in the target zone as ancillary data. After downscaling, we would covert data as interger and` NA` as 0, due to population number can only be integer and larger than or equal to zero.
+```{r dasymetric, warning=FALSE, message=FALSE}
+# dasymetric map with building footprint information as ancillary data
 sf_use_s2(FALSE)
 
 dm_pop = dasymetric_map(target_geom_wgs84, source_geom_wgs84, residential_bf, extensive = "population")
