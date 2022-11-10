@@ -12,7 +12,9 @@ Knowledge of the fine-level population distribution is vital for measuring the i
 
 ```{r, message=F, warning=F}
 require(sf)
-# require(dasymetric)
+library(remotes)
+install_github("JaFro96/dasymetric")
+require(dasymetric)
 library(leaflet)
 library(kableExtra)
 library(piggyback)
@@ -38,8 +40,6 @@ download.file(dataurl,"temp.zip")
 unzip("temp.zip") #unzip the compressed folder
 ```
 ```{r}
-
-
 #' Create a dasymetric map
 #'
 #' @description Binary dasymetric mapping that uses urban areas to make more valuable predictions on population counts
