@@ -12,8 +12,11 @@ Knowledge of the fine-level population distribution is vital for measuring the i
 
 ```{r, message=F, warning=F}
 require(sf)
-library(remotes)
-install_github("JaFro96/dasymetric")
+
+install.packages("remotes")
+remotes::install_github("JaFro96/dasymetric")
+#library(remotes)
+#install_github("JaFro96/dasymetric")
 require(dasymetric)
 library(leaflet)
 library(kableExtra)
