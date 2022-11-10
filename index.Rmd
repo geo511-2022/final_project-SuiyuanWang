@@ -24,6 +24,7 @@ library(lwgeom)
 #remotes::install_github("JaFro96/dasymetric")
 #library(remotes)
 #install_github("JaFro96/dasymetric")
+# auth_token = Sys.getenv('GH_PAT')
 knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 ```
 
@@ -89,7 +90,7 @@ dm_pop$population = as.integer(dm_pop$population)
 # Results
 
 Evaluating the result by plotting ground truth data and estimation result. Then, calculate R2 and coefficients.
-[REFER TO] (https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
+[REFER TO](https://lukemiller.org/index.php/2012/10/adding-p-values-and-r-squared-values-to-a-plot-using-expression/)
 ```{r}
 #calculate r2 in dm_pop, 'population'(estimate) & 'Population'(ground truth)
 mod1 = lm(Population~population, data = dm_pop)
