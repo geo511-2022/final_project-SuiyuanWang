@@ -24,7 +24,7 @@ knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
 ### Download data 
 
 ```{r}
-dataurl = "https://github.com/geo511-2022/final_project-SuiyuanWang/releases/download/v1.0.2/Data_GEO511_project.zip"
+dataurl = "https://github.com/geo511-2022/final_project-SuiyuanWang/releases/download/v1.0.3/Data_GEO511_project.12.43.57.PM.zip"
 
 #tdir=tempdir()
 #download.file(dataurl,destfile=file.path(tdir,"temp.zip"))
@@ -98,7 +98,7 @@ dasymetric_map <- function(target, source, ancillary_data, tid = NULL, extensive
  * Census block group population_bg
 * Microsoft building footprint (2018).
 ```{r}
-landuse <- st_read("Data_GEO511_project/zoning.shp") 
+#landuse <- st_read("Data_GEO511_project/zoning.shp") 
 source_geom <- st_read("Data_GEO511_project/census_bg.shp")
 target_geom <- st_read("Data_GEO511_project/census_block.shp")
 residential_bf <- st_read("Data_GEO511_project/residential_bf.shp")
