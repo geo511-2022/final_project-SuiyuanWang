@@ -5,8 +5,3 @@
 
 ## Background
 GEO511 is a course held at the University at Buffalo. 
-
-
-### TODOs:
-
-* Finish github workflow tests for final project.
