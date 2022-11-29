@@ -187,13 +187,13 @@ For the problems mentioned above, we can try to use more accurate data as ancill
 
 # References
 
-Bakillah, M., et al. (2014). "Fine-resolution population mapping using OpenStreetMap points-of-interest." International Journal of Geographical Information Science 28(9): 1940-1963.
-Frantz, D., et al. (2021). "National-scale mapping of building height using Sentinel-1 and Sentinel-2 time series." Remote Sensing of Environment 252: 112128.
-Huang, X., et al. (2021). "A 100 m population grid in the CONUS by disaggregating census data with open-source Microsoft building footprints." Big earth data 5(1): 112-133.
-Huang, X., et al. (2019). High-resolution population grid in the CONUS using microsoft building footprints: A feasibility study. Proceedings of the 3rd ACM SIGSPATIAL International Workshop on Geospatial Humanities.
-Maantay, J. A., et al. (2007). "Mapping population distribution in the urban environment: The cadastral-based expert dasymetric system (CEDS)." Cartography and Geographic Information Science 34(2): 77-102.
-Mennis, J. (2009). "Dasymetric mapping for estimating population in small areas." Geography Compass 3(2): 727-745.
-Mennis, J. and T. Hultgren (2006). "Intelligent dasymetric mapping and its application to areal interpolation." Cartography and Geographic Information Science 33(3): 179-194.
-Qiu, Y., et al. (2022). "Disaggregating population data for assessing progress of SDGs: methods and applications."  15(1): 2-29.
+1. Bakillah, M., et al. (2014). "Fine-resolution population mapping using OpenStreetMap points-of-interest." International Journal of Geographical Information Science 28(9): 1940-1963.
+2. Frantz, D., et al. (2021). "National-scale mapping of building height using Sentinel-1 and Sentinel-2 time series." Remote Sensing of Environment 252: 112128.
+3. Huang, X., et al. (2021). "A 100 m population grid in the CONUS by disaggregating census data with open-source Microsoft building footprints." Big earth data 5(1): 112-133.
+4. Huang, X., et al. (2019). High-resolution population grid in the CONUS using microsoft building footprints: A feasibility study. Proceedings of the 3rd ACM SIGSPATIAL International Workshop on Geospatial Humanities.
+5. Maantay, J. A., et al. (2007). "Mapping population distribution in the urban environment: The cadastral-based expert dasymetric system (CEDS)." Cartography and Geographic Information Science 34(2): 77-102.
+6. Mennis, J. (2009). "Dasymetric mapping for estimating population in small areas." Geography Compass 3(2): 727-745.
+7. Mennis, J. and T. Hultgren (2006). "Intelligent dasymetric mapping and its application to areal interpolation." Cartography and Geographic Information Science 33(3): 179-194.
+8. Qiu, Y., et al. (2022). "Disaggregating population data for assessing progress of SDGs: methods and applications."  15(1): 2-29.
 
 
