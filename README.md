@@ -4,4 +4,4 @@
 [Websit for project] (https://geo511-2022.github.io/final_project-SuiyuanWang/)
 
 ## Background
-GEO511 is a course held at the University at Buffalo. 
+GEO511 is a course held at the University at Buffalo.
