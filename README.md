@@ -1,11 +1,7 @@
-# Project template for GEO511
+# Suiyuan Wang's final project
+## Mapping fine-scale population using dasymetric method --- A case study in Buffalo city, NY
 
-[![main](https://github.com/AdamWilsonLabEDU/geo511_project_template/workflows/main/badge.svg)](https://github.com/AdamWilsonLabEDU/geo511_project_template/actions)
+[Websit for project] (https://geo511-2022.github.io/final_project-SuiyuanWang/)
 
 ## Background
-This repository serves as a template for the final project in _Spatial Data Science_, (GEO511) a course held at the University at Buffalo.  
-
-
-### TODOs:
-
-* Confirm github workflow tests will function for student projects
+GEO511 is a course held at the University at Buffalo.
